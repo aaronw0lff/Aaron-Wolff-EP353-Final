@@ -52,10 +52,16 @@ void kickgen(float* buffer, Envelope *FreqEnvelope, Envelope *AmpEnvelope){
     loadwavetable(wavetable);
     
     int i=0;
-    for(; i<AmpEnvelope->totalFrames; i++){
-        setFrequencyHz(wavetable, getCurrentFreq(FreqEnvelope));
+    FreqEnvelope->gate = 1;
+    AmpEnvelope->gate = 1;
+    for(i = 0; i < AmpEnvelope->totalFrames; i++){
+        float freq = getCurrentFreq(FreqEnvelope);
+        // printf("\t current freq: %f\n", xfreq);
+        setFrequencyHz(wavetable, freq);
         current_amp = getCurrentAmp(AmpEnvelope);
-        buffer[i] = current_amp;// * next(wavetable);
+        // printf("\tcurrent_amp: %f\n", current_amp);
+        buffer[i] = current_amp * next(wavetable);
+        // * next(wavetable);
     }
 }
 
@@ -68,7 +74,7 @@ void writekick(float* buffer, sf_count_t  num_samples){
     kickinfo.channels = 1;
     kickinfo.frames = num_samples;
     kickinfo.samplerate = 192000;
-    kickinfo.format=SF_FORMAT_WAV | SF_FORMAT_PCM_32;
+    kickinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_32;
 
     printf("size: %lld %lld %d\n", num_samples, kickinfo.frames, kickinfo.channels);
     kickfile = sf_open("K_I_C_C.wav", SFM_WRITE, &kickinfo);
@@ -89,13 +95,13 @@ void writekick(float* buffer, sf_count_t  num_samples){
 
 int main(int argc, char const *argv[])
 {
-    initfreq = 200;
-    attacktime = 10;
-    ampdecay = 10;
-    primfreq = 100;
-    yndescend = 'y';
-    resttime = 200;
-    fadetime = 100;
+    // initfreq = 200;
+    // attacktime = 10;
+    // ampdecay = 10;
+    // primfreq = 100;
+    // yndescend = 'y';
+    // resttime = 200;
+    // fadetime = 100;
     
 //asking and scanning for user-defined parameters
     printf("\n\n\n\n-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-\nW E L C O M E      T O     T H E     F A T    K I C C     G E N E R A T O R  \n-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-\n\nStarting Frequency (Hz): ");
@@ -140,7 +146,7 @@ int main(int argc, char const *argv[])
     kickgen(buffer, FreqEnvelope, AmpEnvelope);
 
     printf("first %d\n", AmpEnvelope->totalFrames);
-    writekick(buffer, AmpEnvelope->totalFrames);
+    writekick(buffer, (sf_count_t) AmpEnvelope->totalFrames);
 
 
   // testing whether values were saved:    printf("\n%d %d %d %c %d %d\n", initfreq, attacktime, primfreq, yndescend, resttime, fadetime);

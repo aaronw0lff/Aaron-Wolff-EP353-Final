@@ -46,6 +46,7 @@ float next(Wavetable *wavetable){
   
   //increment the angle delta of the table and wrap
   wavetable->curIndex += wavetable->delta;
+  
   if(wavetable->curIndex >= (float) wavetable->size){
       wavetable->curIndex -= (float) wavetable->size;
   }
@@ -69,7 +70,8 @@ void setFrequency(Wavetable *wavetable, char *midi){
 void setFrequencyHz(Wavetable *wavetable, float freq_Hz){
 
   wavetable->delta = freq_Hz * (kTableSize / kSamplingRate);
-
+  // printf("\tfreq_hz: %f\n", freq_Hz);
+  // printf("\tdelta: %f\n", wavetable->delta);
 }
 
 void setAmplitude(Wavetable *wavetable, float amplitude){
@@ -84,7 +86,7 @@ void loadwavetable(Wavetable *wavetable){
 
     // float *test_buffer = malloc(1920000 * sizeof(float));
 
-    printf("a\n");
+    // printf("a\n");
     table = sf_open("192sinetable.wav", SFM_READ, &tableinfo);
     //printf("begin loading wavetable\n");
     initWavetable(wavetable, (unsigned long) tableinfo.frames);

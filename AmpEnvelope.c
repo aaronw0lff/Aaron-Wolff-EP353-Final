@@ -1,9 +1,11 @@
 #include "Envelope.h"
+#include <stdio.h>
 
 void initEnvelopeAmp(Envelope *envelope, float duration, int initfreq, int attacktime, int primfreq, char yndescend, int resttime, int fadetime, float sampleRate){
   envelope->duration = duration;
   envelope->sampleRate = sampleRate;
-  envelope->totalFrames = sampleRate * duration;
+  envelope->totalFrames = (sampleRate * duration) / 1000;
+  printf("envelope->totalFrames: %u\n", envelope->totalFrames);
   envelope->max = kMaxAmp;
   envelope->gate = false;
   envelope->curIndex = 0;
@@ -11,23 +13,26 @@ void initEnvelopeAmp(Envelope *envelope, float duration, int initfreq, int attac
 
   int xUnit = envelope->totalFrames / (kNumPoints - 1);
   float yUnit = kMaxAmp / (kNumPoints - 1);
-  
+
 
 
   envelope->points[0].x = 0;
   envelope->points[0].y = 1;
-  envelope->points[1].x = ((float)attacktime/1000)*192000;
+  envelope->points[1].x = ((float)attacktime/1000.0)*192000.0;
   envelope->points[1].y = 0.8;
-  envelope->points[2].x = ((float)resttime/1000)*192000;
-  envelope->points[2].y = primfreq;
-  envelope->points[3].x = ((float)fadetime/1000)*192000;
-  envelope->points[3].y = 0;
+  envelope->points[2].x = ((float)(resttime+attacktime)/1000.0)*192000.0;
+  envelope->points[2].y = 0.8;
+  envelope->points[3].x = ((float)(fadetime+resttime+attacktime)/1000.0)*192000.0;
+  printf("fadetime = %d\n", fadetime);
+  envelope->points[3].y = 0.0;
 
   //Initialize points in the envelope
   for(int i=0; i<kNumPoints; i++){
-    envelope->points[i].x = xUnit * i;
+    //envelope->points[i].x = xUnit * i;
     //Change y points to have different envelope shapes
-    envelope->points[i].y = kMaxAmp - yUnit * i;
+   // envelope->points[i].y = kMaxAmp - yUnit * i;
+    printf("Ampenvelope->points[%d].x: %f\n", i, (float)envelope->points[i].x);
+    printf("Ampenvelope->points[%d].y: %f\n", i, (float)envelope->points[i].y);
   }
   envelope->points[kNumPoints-1].x = envelope->totalFrames;
   envelope->points[kNumPoints-1].y = 0.0f;

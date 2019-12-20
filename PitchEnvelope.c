@@ -1,4 +1,5 @@
 #include "Envelope.h"
+#include <stdio.h>
 
 void initEnvelopeFreq(Envelope *envelope, float duration, int initfreq, int attacktime, int primfreq, char yndescend, int resttime, int fadetime, float sampleRate){
   envelope->duration = duration;
@@ -24,11 +25,11 @@ void initEnvelopeFreq(Envelope *envelope, float duration, int initfreq, int atta
 
   envelope->points[0].x = 0;
   envelope->points[0].y = initfreq;
-  envelope->points[1].x = (attacktime/1000)*192000;
+  envelope->points[1].x = (attacktime/1000.0)*192000.0;
   envelope->points[1].y = primfreq;
-  envelope->points[2].x = (resttime/1000)*192000;
+  envelope->points[2].x = ((attacktime+resttime)/1000.0)*192000.0;
   envelope->points[2].y = primfreq;
-  envelope->points[3].x = (fadetime/1000)*192000;
+  envelope->points[3].x = ((attacktime+resttime+fadetime)/1000.0)*192000.0;
   if(yndescend == 'y'){
     envelope->points[3].y = 20;
   }else if(yndescend == 'n'){
@@ -39,10 +40,14 @@ void initEnvelopeFreq(Envelope *envelope, float duration, int initfreq, int atta
 
   //Initialize points in the envelope
   for(int i=0; i<kNumPoints; i++){
-    envelope->points[i].x = xUnit * i;
+    
+    //envelope->points[i].x = xUnit * i;
     //Change y points to have different envelope shapes
-    envelope->points[i].y = kMaxAmp - yUnit * i;
+   // envelope->points[i].y = kMaxAmp - yUnit * i;
+    printf("pitchenvelope->points[%d].x: %f\n", i, (float)envelope->points[i].x);
+    printf("pitchenvelope->points[%d].y: %f\n", i, (float)envelope->points[i].y);
   }
+
   envelope->points[kNumPoints-1].x = envelope->totalFrames;
   envelope->points[kNumPoints-1].y = 0.0f;
 }
@@ -56,7 +61,6 @@ void resetFreq(Envelope *envelope){
 float getCurrentFreq(Envelope *envelope){
   static Point a, b;
   static float m, y; //slope and amp
-
   //Check to make sure the gate is on
   if(!envelope->gate) return 0;
 
@@ -82,7 +86,8 @@ float getCurrentFreq(Envelope *envelope){
   //Increment frame
   envelope->curFrame++;
 
-  //printf("%d %f %f %f %f\n", envelope->curFrame, a.x, a.y, b.x, b.y);
+  // printf("y: %f\n", y);
+  // printf("%d %f %f %f %f\n", envelope->curFrame, a.x, a.y, b.x, b.y);
 
   return y;
 }

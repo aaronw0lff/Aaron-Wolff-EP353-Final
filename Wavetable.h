@@ -6,7 +6,7 @@
 #include "Audio.h"
 
 #define kDefaultFrequency 440.0
-#define kTableSize (1<<7) //128
+#define kTableSize 192000 //(1<<7) //128
 
 typedef struct Wavetable {
   float *table;
