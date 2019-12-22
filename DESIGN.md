@@ -1,0 +1,7 @@
+This sub kick generator is made by saving using user-entered parameters to an envelope struct, within Envelope.h, which is created by Akito Van Troyer (navreyort on GitHub). Envelope.h is then used in two separate files, called PitchEnvelope.c, and one called AmpEnvelope.c, to create Envelopes based on the user-entered values, and apply them to the pitch and amplitude of a sine wave. This wavetable is opened using sndfile.h and is then loaded into a wavetable struct that is included in Wavetable.h.
+
+This is using Akito's Wavetable.c and Wavetable.h files to scan through a 192,000 sample rate 1 Hz sine wave table, at varying rates. A forloop iterates through every sample of the newly created file "K_I_C_C.wav", and outputs the changed pitch of the previously loaded wavetable. All SubKickGen.o does is simply define two functions: kickgen, and writekick, scans for user values, initialize the Envelopes found in Envelope.h, and then calls the first two previously defined functions:
+
+    kickgen loads the 1 Hz sine wavetable, turns on the gate within the Envelopes, and contains the forloop that uses the Envelopes's setFrequencyHz, and getCurrentAmp functions to write the newly generated sine wave changes to a buffer. 
+
+    writekick simply defines the format for the output file, and writes the buffer into that new audio file: "K_I_C_C.wav"
